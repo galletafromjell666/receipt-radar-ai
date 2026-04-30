@@ -7,3 +7,5 @@ openai
 python-dotenv
 functions-framework
 httpx
+imap-tools
+beautifulsoup4
