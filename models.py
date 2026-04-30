@@ -15,5 +15,4 @@ class Expense(Base):
     account = Column(String)
     description = Column(Text)
     date = Column(DateTime, default=datetime.utcnow, index=True) # Essential for sorting
-    raw_email_body = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
