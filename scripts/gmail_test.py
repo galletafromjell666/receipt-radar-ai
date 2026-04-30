@@ -10,7 +10,7 @@ from utils import clean_html
 
 load_dotenv()
 
-def test_gmail_connection(sender_filter=None, email_id=None, clean=False):
+def test_gmail_connection(query=None, email_id=None, clean=False):
     imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
     email_user = os.getenv("EMAIL_USER")
     email_password = os.getenv("EMAIL_PASSWORD")
@@ -45,8 +45,9 @@ def test_gmail_connection(sender_filter=None, email_id=None, clean=False):
                 print("-" * 50)
                 print(f"Original length: {len(body)} characters")
             else:
-                criteria = AND(from_=sender_filter) if sender_filter else 'ALL'
-                print(f"🔍 Searching emails (Filter: {sender_filter if sender_filter else 'None'})...")
+                # Search for emails using the query across multiple fields
+                criteria = AND(text=query) if query else 'ALL'
+                print(f"🔍 Searching emails (Query: {query if query else 'None'})...")
                 
                 msgs = list(mailbox.fetch(criteria, limit=5, reverse=True))
                 
@@ -63,9 +64,9 @@ def test_gmail_connection(sender_filter=None, email_id=None, clean=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test Gmail connection and fetch emails using imap-tools.")
-    parser.add_argument("--filter", help="Filter emails by sender domain or address")
+    parser.add_argument("--query", help="Search query (matches sender, subject, or body)")
     parser.add_argument("--id", help="Fetch and show content for a specific email UID")
     parser.add_argument("--clean", action="store_true", help="Strip HTML tags using BeautifulSoup")
     
     args = parser.parse_args()
-    test_gmail_connection(sender_filter=args.filter, email_id=args.id, clean=args.clean)
+    test_gmail_connection(query=args.query, email_id=args.id, clean=args.clean)

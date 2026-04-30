@@ -20,9 +20,9 @@ Verifies the IMAP connection to Gmail, allowing you to list recent emails or fet
   ```bash
   python scripts/gmail_test.py
   ```
-- **Filter by sender:**
+- **Search by keyword (Sender, Subject, or Body):**
   ```bash
-  python scripts/gmail_test.py --filter "amazon.com"
+  python scripts/gmail_test.py --query "amazon"
   ```
 - **Show email content by ID (Original):**
   ```bash
