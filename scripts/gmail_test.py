@@ -6,7 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from imap_tools import MailBox, AND
 from dotenv import load_dotenv
-from utils import clean_html
+from utils import format_email_for_ai, clean_html
 
 load_dotenv()
 
@@ -33,7 +33,11 @@ def test_gmail_connection(query=None, email_id=None, clean=False):
                     return
                 
                 msg = msgs[0]
-                body = msg.text if not clean else clean_html(msg.html if msg.html else msg.text)
+                if clean:
+                    body = format_email_for_ai(msg)
+                else:
+                    # Original raw view (text if available, else raw html)
+                    body = msg.text if msg.text else msg.html
                 
                 print("-" * 50)
                 print(f"From: {msg.from_}")
