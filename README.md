@@ -52,8 +52,13 @@ You can trigger this service in two ways on Google Cloud:
 ## Getting Started
 
 1. Clone the repository.
-2. Copy `.env.example` to `.env` and fill in your credentials.
-3. Install dependencies:
+2. Create and activate a virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+3. Copy `.env.example` to `.env` and fill in your credentials.
+4. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
