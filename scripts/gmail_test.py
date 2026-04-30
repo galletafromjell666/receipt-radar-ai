@@ -10,7 +10,7 @@ from utils import format_email_for_ai, clean_html
 
 load_dotenv()
 
-def test_gmail_connection(query=None, email_id=None):
+def test_gmail_connection(query=None, email_id=None, show_llm=False):
     imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
     email_user = os.getenv("EMAIL_USER")
     email_password = os.getenv("EMAIL_PASSWORD")
@@ -26,18 +26,39 @@ def test_gmail_connection(query=None, email_id=None):
             print("✅ Login successful!")
 
             if email_id:
+                print(f"📄 Fetching content for Email UID: {email_id}...")
                 msgs = list(mailbox.fetch(AND(uid=email_id)))
                 if not msgs:
                     print(f"❌ No email found with UID: {email_id}")
                     return
                 
                 msg = msgs[0]
-                formatted_content = format_email_for_ai(msg)
                 
-                print("\n--- CONTENT SENT TO LLM ---")
-                print(formatted_content)
-                print("--- END OF CONTENT ---")
-                print(f"Length: {len(formatted_content)} characters")
+                print("\n" + "="*60)
+                print("RAW EMAIL DETAILS")
+                print("="*60)
+                print(f"From:    {msg.from_}")
+                print(f"Date:    {msg.date}")
+                print(f"Subject: {msg.subject}")
+                print("-" * 60)
+                print("BODY:")
+                # Show raw text if available, otherwise raw html
+                print(msg.text if msg.text else msg.html)
+                print("-" * 60)
+                print(f"Raw Length: {len(msg.text if msg.text else msg.html)} characters")
+
+                if show_llm:
+                    formatted_content = format_email_for_ai(msg)
+                    print("\n" + "*"*60)
+                    print("PREVIEW: CONTENT SENT TO LLM")
+                    print("*"*60)
+                    print(formatted_content)
+                    print("*"*60)
+                    print(f"LLM Content Length: {len(formatted_content)} characters")
+                else:
+                    print("\n💡 Tip: Use --llm flag to see the cleaned version sent to the AI.")
+                
+                print("="*60 + "\n")
             else:
                 # Search for emails using the query across multiple fields
                 criteria = AND(text=query) if query else 'ALL'
@@ -60,6 +81,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test Gmail connection and fetch emails using imap-tools.")
     parser.add_argument("--query", help="Search query (matches sender, subject, or body)")
     parser.add_argument("--id", help="Fetch and show content for a specific email UID")
+    parser.add_argument("--llm", action="store_true", help="Show the cleaned version sent to the AI")
     
     args = parser.parse_args()
-    test_gmail_connection(query=args.query, email_id=args.id)
+    test_gmail_connection(query=args.query, email_id=args.id, show_llm=args.llm)
