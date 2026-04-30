@@ -8,9 +8,14 @@ This folder contains scripts to test and verify the different components of the 
 Verifies the connection to the DeepSeek API and ensures the model is responding.
 
 **Usage:**
-```bash
-python scripts/ai_test.py
-```
+- **Simple Hello World:**
+  ```bash
+  python scripts/ai_test.py
+  ```
+- **Test with sample banking email:**
+  ```bash
+  python scripts/ai_test.py --email
+  ```
 
 ### 2. Gmail Connection Test ([gmail_test.py](gmail_test.py))
 Verifies the IMAP connection to Gmail, allowing you to list recent emails or fetch specific content.

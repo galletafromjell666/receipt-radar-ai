@@ -1,3 +1,21 @@
+def get_expense_extraction_prompt(email_content):
+    """
+    Returns the standard prompt used for extracting expense data from email content.
+    """
+    return f"""
+    Extract expense information from the following email content.
+    Return the result as a JSON object with these keys:
+    - amount (float)
+    - currency (string, 3-letter code)
+    - category (string, e.g., Food, Transport, Utilities, Entertainment, etc.)
+    - merchant (string)
+    - description (string)
+    - date (string, ISO format if possible)
+
+    Email content:
+    {email_content}
+    """
+
 def format_email_for_ai(msg):
     """
     Consolidates subject, sender, and cleaned body into a single string for the AI.
