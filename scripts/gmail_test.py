@@ -11,7 +11,7 @@ from utils import format_email_for_ai, clean_html
 load_dotenv()
 
 def test_gmail_connection(query=None, email_id=None, show_llm=False):
-    imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
+    imap_server = os.getenv("IMAP_SERVER")
     email_user = os.getenv("EMAIL_USER")
     email_password = os.getenv("EMAIL_PASSWORD")
 

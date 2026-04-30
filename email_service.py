@@ -5,7 +5,7 @@ from utils import format_email_for_ai
 
 load_dotenv()
 
-IMAP_SERVER = os.getenv("IMAP_SERVER", "imap.gmail.com")
+IMAP_SERVER = os.getenv("IMAP_SERVER")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 

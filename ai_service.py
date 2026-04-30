@@ -7,8 +7,8 @@ from utils import get_expense_extraction_prompt
 load_dotenv()
 
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
-DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL")
+DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL")
 
 client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url=DEEPSEEK_BASE_URL)
 
