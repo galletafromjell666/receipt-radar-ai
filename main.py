@@ -2,6 +2,7 @@ import functions_framework
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db, engine
+from datetime import datetime
 import models
 from ai_service import extract_expense_from_email
 
@@ -35,16 +36,23 @@ def trigger_sync(db: Session = Depends(get_db)):
             extracted_data = extract_expense_from_email(email_data["body"])
             
             # 2. Save to DB
+            extracted_date = extracted_data.get("date")
+            try:
+                expense_date = datetime.fromisoformat(extracted_date.replace("Z", "+00:00")) if extracted_date else datetime.utcnow()
+            except:
+                expense_date = datetime.utcnow()
+
             new_expense = models.Expense(
                 email_id=email_data["email_id"],
                 amount=extracted_data.get("amount"),
                 currency=extracted_data.get("currency", "USD"),
                 category=extracted_data.get("category"),
-            merchant=extracted_data.get("merchant"),
-            source=extracted_data.get("source"),
-            account=extracted_data.get("account"),
-            description=extracted_data.get("description")
-        )
+                merchant=extracted_data.get("merchant"),
+                source=extracted_data.get("source"),
+                account=extracted_data.get("account"),
+                description=extracted_data.get("description"),
+                date=expense_date
+            )
             
             db.add(new_expense)
             db.commit()
