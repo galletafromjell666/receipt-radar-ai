@@ -6,13 +6,20 @@ load_dotenv()
 
 def test_deepseek_connection():
     api_key = os.getenv("DEEPSEEK_API_KEY")
-    base_url = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
-    model = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+    base_url = os.getenv("DEEPSEEK_BASE_URL")
+    model = os.getenv("DEEPSEEK_MODEL")
 
+    if not model:
+        print("❌ Error: DEEPSEEK_MODEL not found in .env file.")
+        return
     if not api_key:
         print("❌ Error: DEEPSEEK_API_KEY not found in .env file.")
         return
 
+    if not base_url or not model:
+        print("❌ Error: DEEPSEEK_BASE_URL or DEEPSEEK_MODEL not found in .env file.")
+        return
+    
     print(f"🚀 Connecting to DeepSeek at {base_url} using {model}...")
     
     try:

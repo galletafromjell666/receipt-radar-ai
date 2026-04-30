@@ -86,5 +86,5 @@ This starts a server on port 8080. You can trigger it with:
 curl -X POST http://localhost:8080/sync
 ```
 
-## Testing AI Extraction
-To verify that the AI is correctly parsing your emails, simply ensure your `.env` is configured and trigger a sync using one of the local methods above.
+## Utility Scripts
+Additional scripts for testing individual components (AI and Gmail) are available in the [scripts/](scripts/) directory. See the [scripts/README.md](scripts/README.md) for usage instructions.
