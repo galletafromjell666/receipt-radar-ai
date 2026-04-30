@@ -1,34 +1,58 @@
 import os
 import imaplib
 import email
+import re
 from email.header import decode_header
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_email_body(msg):
+def clean_html(html_content):
+    """Basic HTML tag stripping to save tokens and clean up content for AI."""
+    # Remove script and style elements
+    clean = re.sub(r'<(script|style).*?>.*?</\1>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
+    # Remove all other tags
+    clean = re.sub(r'<.*?>', ' ', clean)
+    # Remove multiple whitespace
+    clean = re.sub(r'\s+', ' ', clean).strip()
+    return clean
+
+def get_email_body(msg, clean=False):
     body = ""
+    html_body = ""
+    
     if msg.is_multipart():
         for part in msg.walk():
             content_type = part.get_content_type()
             content_disposition = str(part.get("Content-Disposition"))
+            
             try:
+                charset = part.get_content_charset() or "utf-8"
                 payload = part.get_payload(decode=True)
+                
                 if payload:
-                    part_body = payload.decode()
+                    part_body = payload.decode(charset, errors="replace")
+                    
                     if content_type == "text/plain" and "attachment" not in content_disposition:
                         body = part_body
-                        break
-            except:
+                        break 
+                    elif content_type == "text/html" and "attachment" not in content_disposition:
+                        html_body = part_body
+            except Exception as e:
                 continue
+        
+        if not body and html_body:
+            body = clean_html(html_body) if clean else html_body
     else:
         try:
-            body = msg.get_payload(decode=True).decode()
+            charset = msg.get_content_charset() or "utf-8"
+            body = msg.get_payload(decode=True).decode(charset, errors="replace")
         except:
             body = "[Could not decode body]"
-    return body
+            
+    return body.strip()
 
-def test_gmail_connection(sender_filter=None, email_id=None):
+def test_gmail_connection(sender_filter=None, email_id=None, clean=False):
     imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
     email_user = os.getenv("EMAIL_USER")
     email_password = os.getenv("EMAIL_PASSWORD")
@@ -61,7 +85,7 @@ def test_gmail_connection(sender_filter=None, email_id=None):
                     
                     from_ = msg.get("From")
                     date = msg.get("Date")
-                    body = get_email_body(msg)
+                    body = get_email_body(msg, clean=clean)
                     
                     print("-" * 50)
                     print(f"From: {from_}")
@@ -71,6 +95,7 @@ def test_gmail_connection(sender_filter=None, email_id=None):
                     print("BODY:")
                     print(body)
                     print("-" * 50)
+                    print(f"Original length: {len(body)} characters")
         else:
             # Search for emails
             if sender_filter:
@@ -122,6 +147,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test Gmail connection and fetch emails.")
     parser.add_argument("--filter", help="Filter emails by sender domain or address")
     parser.add_argument("--id", help="Fetch and show content for a specific email ID")
+    parser.add_argument("--clean", action="store_true", help="Strip HTML tags from the body")
     
     args = parser.parse_args()
-    test_gmail_connection(sender_filter=args.filter, email_id=args.id)
+    test_gmail_connection(sender_filter=args.filter, email_id=args.id, clean=args.clean)

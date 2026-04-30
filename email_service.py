@@ -2,9 +2,20 @@ import imaplib
 import email
 from email.header import decode_header
 import os
+import re
 from dotenv import load_dotenv
 
 load_dotenv()
+
+def clean_html(html_content):
+    """Basic HTML tag stripping to save tokens and clean up content for AI."""
+    # Remove script and style elements
+    clean = re.sub(r'<(script|style).*?>.*?</\1>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
+    # Remove all other tags
+    clean = re.sub(r'<.*?>', ' ', clean)
+    # Remove multiple whitespace
+    clean = re.sub(r'\s+', ' ', clean).strip()
+    return clean
 
 IMAP_SERVER = os.getenv("IMAP_SERVER", "imap.gmail.com")
 EMAIL_USER = os.getenv("EMAIL_USER")
@@ -40,19 +51,32 @@ def get_unprocessed_emails():
                     subject = subject.decode(encoding if encoding else "utf-8")
                 
                 body = ""
+                html_body = ""
                 if msg.is_multipart():
                     for part in msg.walk():
                         content_type = part.get_content_type()
                         content_disposition = str(part.get("Content-Disposition"))
                         try:
-                            part_body = part.get_payload(decode=True).decode()
+                            charset = part.get_content_charset() or "utf-8"
+                            payload = part.get_payload(decode=True)
+                            if payload:
+                                part_body = payload.decode(charset, errors="replace")
+                                if content_type == "text/plain" and "attachment" not in content_disposition:
+                                    body = part_body
+                                    break
+                                elif content_type == "text/html" and "attachment" not in content_disposition:
+                                    html_body = part_body
                         except:
                             continue
-                        if content_type == "text/plain" and "attachment" not in content_disposition:
-                            body = part_body
-                            break
+                    
+                    if not body and html_body:
+                        body = clean_html(html_body) # Fallback to cleaned HTML
                 else:
-                    body = msg.get_payload(decode=True).decode()
+                    try:
+                        charset = msg.get_content_charset() or "utf-8"
+                        body = msg.get_payload(decode=True).decode(charset, errors="replace")
+                    except:
+                        body = ""
 
                 results.append({
                     "email_id": e_id.decode(),
