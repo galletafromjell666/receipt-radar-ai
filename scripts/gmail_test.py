@@ -10,7 +10,7 @@ from utils import format_email_for_ai, clean_html
 
 load_dotenv()
 
-def test_gmail_connection(query=None, email_id=None, clean=False):
+def test_gmail_connection(query=None, email_id=None):
     imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
     email_user = os.getenv("EMAIL_USER")
     email_password = os.getenv("EMAIL_PASSWORD")
@@ -26,28 +26,18 @@ def test_gmail_connection(query=None, email_id=None, clean=False):
             print("✅ Login successful!")
 
             if email_id:
-                print(f"📄 Fetching content for Email UID: {email_id}...")
                 msgs = list(mailbox.fetch(AND(uid=email_id)))
                 if not msgs:
                     print(f"❌ No email found with UID: {email_id}")
                     return
                 
                 msg = msgs[0]
-                if clean:
-                    body = format_email_for_ai(msg)
-                else:
-                    # Original raw view (text if available, else raw html)
-                    body = msg.text if msg.text else msg.html
+                formatted_content = format_email_for_ai(msg)
                 
-                print("-" * 50)
-                print(f"From: {msg.from_}")
-                print(f"Date: {msg.date}")
-                print(f"Subject: {msg.subject}")
-                print("-" * 50)
-                print("BODY:")
-                print(body)
-                print("-" * 50)
-                print(f"Original length: {len(body)} characters")
+                print("\n--- CONTENT SENT TO LLM ---")
+                print(formatted_content)
+                print("--- END OF CONTENT ---")
+                print(f"Length: {len(formatted_content)} characters")
             else:
                 # Search for emails using the query across multiple fields
                 criteria = AND(text=query) if query else 'ALL'
@@ -70,7 +60,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test Gmail connection and fetch emails using imap-tools.")
     parser.add_argument("--query", help="Search query (matches sender, subject, or body)")
     parser.add_argument("--id", help="Fetch and show content for a specific email UID")
-    parser.add_argument("--clean", action="store_true", help="Strip HTML tags using BeautifulSoup")
     
     args = parser.parse_args()
-    test_gmail_connection(query=args.query, email_id=args.id, clean=args.clean)
+    test_gmail_connection(query=args.query, email_id=args.id)

@@ -24,13 +24,9 @@ Verifies the IMAP connection to Gmail, allowing you to list recent emails or fet
   ```bash
   python scripts/gmail_test.py --query "amazon"
   ```
-- **Show email content by ID (Original):**
+- **Show email content by ID:**
   ```bash
   python scripts/gmail_test.py --id <EMAIL_ID>
-  ```
-- **Show email content by ID (Cleaned/Stripped):**
-  ```bash
-  python scripts/gmail_test.py --id <EMAIL_ID> --clean
   ```
 
 ## Configuration
