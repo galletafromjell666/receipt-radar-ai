@@ -40,10 +40,12 @@ def trigger_sync(db: Session = Depends(get_db)):
                 amount=extracted_data.get("amount"),
                 currency=extracted_data.get("currency", "USD"),
                 category=extracted_data.get("category"),
-                merchant=extracted_data.get("merchant"),
-                description=extracted_data.get("description"),
-                raw_email_body=email_data["body"]
-            )
+            merchant=extracted_data.get("merchant"),
+            source=extracted_data.get("source"),
+            account=extracted_data.get("account"),
+            description=extracted_data.get("description"),
+            raw_email_body=email_data["body"]
+        )
             
             db.add(new_expense)
             db.commit()

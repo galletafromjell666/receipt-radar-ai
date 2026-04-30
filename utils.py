@@ -9,6 +9,8 @@ def get_expense_extraction_prompt(email_content):
     - currency (string, 3-letter code)
     - category (string, e.g., Food, Transport, Utilities, Entertainment, etc.)
     - merchant (string)
+    - source (string, the bank or financial institution, e.g., Banco Cuscatlan)
+    - account (string, the specific card or account identifier, e.g., XXXXXXXXXX9104)
     - description (string)
     - date (string, ISO format if possible)
 

@@ -11,6 +11,8 @@ class Expense(Base):
     currency = Column(String, default="USD")
     category = Column(String, index=True)
     merchant = Column(String, index=True)
+    source = Column(String, index=True) # e.g., Banco Cuscatlan
+    account = Column(String, index=True) # e.g., Visa 9104
     description = Column(Text)
     date = Column(DateTime, default=datetime.utcnow)
     raw_email_body = Column(Text)
