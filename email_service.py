@@ -1,5 +1,5 @@
 import os
-from imap_tools import MailBox, AND
+from imap_tools import MailBox, AND, NOT
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from utils import format_email_for_ai
@@ -30,12 +30,12 @@ def get_unprocessed_emails():
             seen_uids = set()
             
             for query in queries:
-                # Search for emails matching the query AND date AND not processed
-                # imap-tools AND(text=query) searches in subject, body, and sender
-                criteria = AND(date_gte=date_limit, keyword_not='$Processed', text=query)
+                # Search for emails matching the query AND date AND NOT processed
+                # Move NOT to the front to avoid Python's "positional after keyword" error
+                criteria = AND(NOT(keyword='$Processed'), date_gte=date_limit, text=query)
                 
                 # Fetch up to 20 per query (reverse order)
-                for msg in mailbox.fetch(criteria, limit=50, reverse=True):
+                for msg in mailbox.fetch(criteria, limit=20, reverse=True):
                     if msg.uid in seen_uids:
                         continue
                     
