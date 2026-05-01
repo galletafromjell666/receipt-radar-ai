@@ -49,14 +49,6 @@ Verifies the IMAP connection to Gmail, allowing you to list recent emails or fet
   python3 scripts/gmail_test.py --id <EMAIL_ID> --llm
   ```
 
-### 3. Gmail Push Registration ([register_watch.py](register_watch.py))
-Utility to register for Gmail Push Notifications (Pub/Sub). Note: This is an optional alternative to the default polling method.
-
-**Usage:**
-  ```bash
-  python3 scripts/register_watch.py
-  ```
-
 **All Arguments:**
 - `--query`: Search string to filter emails.
 - `--id`: Specific email UID to fetch and display.
