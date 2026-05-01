@@ -1,4 +1,5 @@
 import os
+import json
 from sqlalchemy.orm import Session
 from database import get_db, engine
 from datetime import datetime
@@ -66,6 +67,9 @@ def run_sync(db: Session):
             print("-" * 40)
             
             extracted_data = extract_expense_from_email(email_data["body"])
+            
+            print("✨ AI Extracted Data:")
+            print(json.dumps(extracted_data, indent=2))
             
             # 2. Save to DB
             extracted_date = extracted_data.get("date")
