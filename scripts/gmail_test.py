@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from imap_tools import MailBox, AND
 from dotenv import load_dotenv
-from src.utils import format_email_for_ai, clean_html, check_connections
+from src.utils import format_email_for_ai, check_connections
 
 load_dotenv()
 

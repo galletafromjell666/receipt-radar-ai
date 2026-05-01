@@ -4,3 +4,4 @@ openai
 python-dotenv
 imap-tools
 beautifulsoup4
+ruff
