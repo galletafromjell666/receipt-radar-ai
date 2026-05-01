@@ -1,8 +1,6 @@
 sqlalchemy
 psycopg2-binary
-pydantic
 openai
 python-dotenv
-httpx
 imap-tools
 beautifulsoup4
