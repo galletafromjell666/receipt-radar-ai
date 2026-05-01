@@ -1,0 +1,39 @@
+[project]
+name = "receipt-radar-ai"
+version = "0.1.0"
+description = "AI-powered automated expense tracker"
+authors = [
+    {name = "Giovanni Hernandez"}
+]
+dependencies = [
+    "sqlalchemy",
+    "psycopg2-binary",
+    "openai",
+    "python-dotenv",
+    "imap-tools",
+    "beautifulsoup4",
+]
+
+[tool.ruff]
+# Enable standard rules
+# E: pycodestyle errors
+# F: Pyflakes
+# I: isort (import sorting)
+# B: flake8-bugbear (finds common bugs)
+select = ["E", "F", "I", "B"]
+ignore = []
+
+# Allow fixable violations (like unused imports) to be automatically fixed.
+fixable = ["ALL"]
+unfixable = []
+
+# Line length (Black standard)
+line-length = 88
+
+[tool.ruff.format]
+# Use double quotes, like Black.
+quote-style = "double"
+# Use spaces for indentation.
+indent-style = "space"
+# Enable preview features if needed
+preview = false
