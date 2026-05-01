@@ -10,7 +10,7 @@ def get_expense_extraction_prompt(email_content):
     - category (string, e.g., Food, Transport, Utilities, Entertainment, etc.)
     - merchant (string)
     - source (string, the bank or financial institution, e.g., Banco Cuscatlan)
-    - account (string, the specific card or account identifier, e.g., XXXXXXXXXX9104, we just need the last 4 digits or whatever is available)
+    - account (string, the specific card or account identifier, e.g., XXXXXXXXXX9104, we just need the last 4 digits without the Xs or whatever is available)
     - description (string)
     - date (string, ISO format. If no date is mentioned in the content, use the "Date:" field provided in the metadata)
 
