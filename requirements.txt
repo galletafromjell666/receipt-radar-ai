@@ -1,11 +1,8 @@
-fastapi
-uvicorn
 sqlalchemy
 psycopg2-binary
 pydantic
 openai
 python-dotenv
-functions-framework
 httpx
 imap-tools
 beautifulsoup4

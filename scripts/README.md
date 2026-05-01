@@ -21,9 +21,13 @@ Verifies the connection to the DeepSeek API and ensures the model is responding.
 Verifies the IMAP connection to Gmail, allowing you to list recent emails or fetch specific content.
 
 **Usage:**
-- **List recent emails:**
+- **List recent emails (default 10):**
   ```bash
   python3 scripts/gmail_test.py
+  ```
+- **List emails from the last 7 days with a limit of 5:**
+  ```bash
+  python3 scripts/gmail_test.py --days 7 --limit 5
   ```
 - **Search by keyword (Sender, Subject, or Body):**
   ```bash

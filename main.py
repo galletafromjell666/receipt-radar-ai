@@ -1,5 +1,3 @@
-import functions_framework
-from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db, engine
 from datetime import datetime
@@ -9,18 +7,12 @@ from ai_service import extract_expense_from_email
 # Create tables on startup (simple for now)
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
-
 from email_service import get_unprocessed_emails, mark_as_processed
 
-@app.get("/")
-def health_check():
-    return {"status": "ok"}
-
-@app.post("/sync")
-def trigger_sync(db: Session = Depends(get_db)):
+def run_sync(db: Session):
     """
-    Manually or via Cron trigger a sync with the email server.
+    Core logic to sync emails with the database.
+    Can be called locally or from a scheduler.
     """
     emails = get_unprocessed_emails()
     processed_count = 0
@@ -57,47 +49,23 @@ def trigger_sync(db: Session = Depends(get_db)):
             db.add(new_expense)
             db.commit()
             
-            # 3. Mark as processed on email server
+            # 3. Mark as processed on email server (using custom $Processed flag)
             mark_as_processed(email_data["email_id"])
             processed_count += 1
+            print(f"✅ Processed email: {email_data['email_id']}")
             
         except Exception as e:
-            print(f"Error processing email {email_data['email_id']}: {e}")
+            print(f"❌ Error processing email {email_data['email_id']}: {e}")
             continue
             
-    return {"status": "success", "processed": processed_count}
+    return processed_count
 
-
-import base64
-import json
-
-@functions_framework.http
-def handle_http(request):
-    """Entry point for HTTP triggers (Cloud Scheduler, Manual)."""
-    from fastapi.testclient import TestClient
-    client = TestClient(app)
-    
-    method = request.method
-    path = request.path
-    headers = dict(request.headers)
-    body = request.get_data()
-    
-    response = client.request(
-        method=method,
-        url=path,
-        headers=headers,
-        content=body
-    )
-    
-    return (response.content, response.status_code, response.headers.items())
-
-@functions_framework.cloud_event
-def handle_pubsub(cloud_event):
-    """
-    Entry point for Pub/Sub triggers (Gmail Push Notifications).
-    Gmail sends a message to Pub/Sub -> Pub/Sub triggers this function.
-    """
-    # The Pub/Sub message data is base64 encoded
+if __name__ == "__main__":
+    # Local execution entry point
+    print("🚀 Starting local sync...")
+    with next(get_db()) as session:
+        count = run_sync(session)
+        print(f"🏁 Sync finished. Processed {count} emails.")
     # data = base64.b64decode(cloud_event.data["message"]["data"]).decode()
     # For Gmail push, the data contains the email address and historyId.
     # We just use it as a signal to trigger our sync logic.

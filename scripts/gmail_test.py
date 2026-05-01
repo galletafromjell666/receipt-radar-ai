@@ -1,6 +1,7 @@
 import os
 import argparse
 import sys
+from datetime import datetime, timedelta
 # Add parent directory to sys.path to allow importing from utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -10,7 +11,7 @@ from utils import format_email_for_ai, clean_html
 
 load_dotenv()
 
-def test_gmail_connection(query=None, email_id=None, show_llm=False):
+def test_gmail_connection(query=None, email_id=None, show_llm=False, days=None, limit=10):
     imap_server = os.getenv("IMAP_SERVER")
     email_user = os.getenv("EMAIL_USER")
     email_password = os.getenv("EMAIL_PASSWORD")
@@ -60,19 +61,28 @@ def test_gmail_connection(query=None, email_id=None, show_llm=False):
                 
                 print("="*60 + "\n")
             else:
-                # Search for emails using the query across multiple fields
-                criteria = AND(text=query) if query else 'ALL'
+                # Search for emails using the query and optional date limit
+                criteria_parts = []
+                if query:
+                    criteria_parts.append(AND(text=query))
+                
+                if days:
+                    date_limit = (datetime.now() - timedelta(days=days)).date()
+                    criteria_parts.append(AND(date_gte=date_limit))
+                    print(f"📅 Filtering emails since: {date_limit} ({days} days ago)")
+
+                criteria = AND(*criteria_parts) if criteria_parts else 'ALL'
                 print(f"🔍 Searching emails (Query: {query if query else 'None'})...")
                 
-                msgs = list(mailbox.fetch(criteria, limit=5, reverse=True))
+                msgs = list(mailbox.fetch(criteria, limit=limit, reverse=True))
                 
                 if not msgs:
                     print("ℹ️ No emails found matching the criteria.")
                 else:
-                    print(f"\n📬 Showing last {len(msgs)} emails:")
+                    print(f"\n📬 Showing last {len(msgs)} emails (Limit: {limit}):")
                     print("-" * 50)
                     for msg in msgs:
-                        print(f"UID: {msg.uid} | From: {msg.from_} | Subject: {msg.subject}")
+                        print(f"UID: {msg.uid} | Date: {msg.date.date()} | From: {msg.from_} | Subject: {msg.subject}")
 
     except Exception as e:
         print(f"\n❌ Failed to connect to Gmail: {e}")
@@ -82,6 +92,8 @@ if __name__ == "__main__":
     parser.add_argument("--query", help="Search query (matches sender, subject, or body)")
     parser.add_argument("--id", help="Fetch and show content for a specific email UID")
     parser.add_argument("--llm", action="store_true", help="Show the cleaned version sent to the AI")
+    parser.add_argument("--days", type=int, help="Number of days back to search")
+    parser.add_argument("--limit", type=int, default=10, help="Maximum number of emails to fetch (default: 10)")
     
     args = parser.parse_args()
-    test_gmail_connection(query=args.query, email_id=args.id, show_llm=args.llm)
+    test_gmail_connection(query=args.query, email_id=args.id, show_llm=args.llm, days=args.days, limit=args.limit)
