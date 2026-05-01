@@ -19,7 +19,7 @@ This project is a standalone worker designed to automate the process of tracking
 ## Project Structure
 
 ```text
-receipt-radar-ai/
+x/
 ├── src/                # Core logic (AI, Email, Database)
 ├── scripts/            # Testing and setup utilities
 ├── main.py             # Main entry point
@@ -54,6 +54,21 @@ Copy `.env.example` to `.env` and fill in your credentials:
 To trigger a synchronization:
 ```bash
 python3 main.py
+```
+
+## Linting & Formatting
+
+The project uses **Ruff** for fast linting and formatting.
+
+```bash
+# Check for errors and unused imports
+ruff check .
+
+# Automatically fix fixable errors
+ruff check --fix .
+
+# Format the codebase
+ruff format .
 ```
 
 ## Testing & Utilities
