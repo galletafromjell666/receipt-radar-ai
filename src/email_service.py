@@ -9,20 +9,15 @@ load_dotenv()
 IMAP_SERVER = os.getenv("IMAP_SERVER")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-FETCH_DAYS_LIMIT = int(os.getenv("FETCH_DAYS_LIMIT"))
-
 def get_unprocessed_emails():
     results = []
     # Use environment variable for search queries (comma-separated)
     queries_env = os.getenv("SEARCH_QUERIES")
-    if not queries_env:
-        print("❌ Error: SEARCH_QUERIES not found in environment.")
-        return []
-    
     queries = [q.strip() for q in queries_env.split(",")]
     
     # Calculate date limit
-    date_limit = (datetime.now() - timedelta(days=FETCH_DAYS_LIMIT)).date()
+    fetch_days = int(os.getenv("FETCH_DAYS_LIMIT", "30"))
+    date_limit = (datetime.now() - timedelta(days=fetch_days)).date()
     
     try:
         with MailBox(IMAP_SERVER).login(EMAIL_USER, EMAIL_PASSWORD) as mailbox:

@@ -18,7 +18,7 @@ except Exception as e:
     exit(1)
 
 def check_connections():
-    """Verify all external services are reachable before starting."""
+    """Verify all external services are reachable and env vars are present before starting."""
     print("🔍 Pre-flight checks...")
     
     # 1. Check AI Key
@@ -31,7 +31,12 @@ def check_connections():
         print("❌ SEARCH_QUERIES is missing in environment!")
         return False
     
-    # 3. Check Email Connection
+    # 3. Check Email Configuration
+    if not all([IMAP_SERVER, EMAIL_USER, EMAIL_PASSWORD]):
+        print("❌ Email configuration (IMAP_SERVER, USER, or PASSWORD) is missing!")
+        return False
+    
+    # 4. Check Email Connection
     try:
         with MailBox(IMAP_SERVER).login(EMAIL_USER, EMAIL_PASSWORD) as mailbox:
             print("✅ Email connection successful.")
