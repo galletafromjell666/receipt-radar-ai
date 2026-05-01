@@ -2,7 +2,7 @@ import os
 import json
 from openai import OpenAI
 from dotenv import load_dotenv
-from utils import get_expense_extraction_prompt
+from src.utils import get_expense_extraction_prompt
 
 load_dotenv()
 

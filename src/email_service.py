@@ -2,7 +2,7 @@ import os
 from imap_tools import MailBox, AND, NOT
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from utils import format_email_for_ai
+from src.utils import format_email_for_ai
 
 load_dotenv()
 

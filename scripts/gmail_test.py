@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from imap_tools import MailBox, AND
 from dotenv import load_dotenv
-from utils import format_email_for_ai, clean_html
+from src.utils import format_email_for_ai, clean_html
 
 load_dotenv()
 

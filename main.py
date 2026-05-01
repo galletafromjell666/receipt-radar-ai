@@ -1,11 +1,11 @@
 import os
 import json
 from sqlalchemy.orm import Session
-from database import get_db, engine
+from src.database import get_db, engine
 from datetime import datetime
-import models
-from email_service import get_unprocessed_emails, mark_as_processed, IMAP_SERVER, EMAIL_USER, EMAIL_PASSWORD
-from ai_service import extract_expense_from_email, DEEPSEEK_API_KEY
+from src import models
+from src.email_service import get_unprocessed_emails, mark_as_processed, IMAP_SERVER, EMAIL_USER, EMAIL_PASSWORD
+from src.ai_service import extract_expense_from_email, DEEPSEEK_API_KEY
 from imap_tools import MailBox
 
 # Create tables on startup (simple for now)

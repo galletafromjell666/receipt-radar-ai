@@ -16,6 +16,17 @@ This project is a standalone worker designed to automate the process of tracking
 - **Standalone Execution**: Designed to run as a simple cron job or local script, with no heavy web-server overhead.
 - **Direct DB Architecture**: The worker handles ingestion and processing, while the frontend is designed to query the database directly.
 
+## Project Structure
+
+```text
+receipt-radar-ai/
+├── src/                # Core logic (AI, Email, Database)
+├── scripts/            # Testing and setup utilities
+├── main.py             # Main entry point
+├── .env                # Local configuration (ignored)
+└── requirements.txt    # Project dependencies
+```
+
 ## Getting Started
 
 ### 1. Installation
