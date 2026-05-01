@@ -61,6 +61,10 @@ def run_sync(db: Session):
             
         try:
             # 1. Extract data using AI
+            print(f"\n--- Sending to LLM (UID: {email_data['email_id']}) ---")
+            print(email_data["body"])
+            print("-" * 40)
+            
             extracted_data = extract_expense_from_email(email_data["body"])
             
             # 2. Save to DB
