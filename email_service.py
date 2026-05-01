@@ -13,26 +13,41 @@ FETCH_DAYS_LIMIT = int(os.getenv("FETCH_DAYS_LIMIT", "30"))
 
 def get_unprocessed_emails():
     results = []
+    # Use environment variable for search queries (comma-separated)
+    queries_env = os.getenv("SEARCH_QUERIES")
+    if not queries_env:
+        print("❌ Error: SEARCH_QUERIES not found in environment.")
+        return []
+    
+    queries = [q.strip() for q in queries_env.split(",")]
+    
     # Calculate date limit
     date_limit = (datetime.now() - timedelta(days=FETCH_DAYS_LIMIT)).date()
     
     try:
         with MailBox(IMAP_SERVER).login(EMAIL_USER, EMAIL_PASSWORD) as mailbox:
-            # Filter by date and exclude emails already marked with our custom $Processed flag
-            # This is more robust than checking 'seen' status, which might be triggered by a phone app
-            criteria = AND(date_gte=date_limit, keyword_not='$Processed')
+            # We'll use a dictionary to deduplicate emails if they match multiple queries
+            seen_uids = set()
             
-            # Fetch last 20 emails from INBOX
-            for msg in mailbox.fetch(criteria, limit=20, reverse=True):
-                # Use the new formatter to include subject and sender in the content
-                full_content = format_email_for_ai(msg)
+            for query in queries:
+                # Search for emails matching the query AND date AND not processed
+                # imap-tools AND(text=query) searches in subject, body, and sender
+                criteria = AND(date_gte=date_limit, keyword_not='$Processed', text=query)
                 
-                results.append({
-                    "email_id": msg.uid,
-                    "subject": msg.subject,
-                    "body": full_content,
-                    "sender": msg.from_
-                })
+                # Fetch up to 20 per query (reverse order)
+                for msg in mailbox.fetch(criteria, limit=50, reverse=True):
+                    if msg.uid in seen_uids:
+                        continue
+                    
+                    seen_uids.add(msg.uid)
+                    full_content = format_email_for_ai(msg)
+                    
+                    results.append({
+                        "email_id": msg.uid,
+                        "subject": msg.subject,
+                        "body": full_content,
+                        "sender": msg.from_
+                    })
     except Exception as e:
         print(f"Error fetching emails: {e}")
     

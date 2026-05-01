@@ -2,18 +2,53 @@ from sqlalchemy.orm import Session
 from database import get_db, engine
 from datetime import datetime
 import models
-from ai_service import extract_expense_from_email
+from email_service import get_unprocessed_emails, mark_as_processed, IMAP_SERVER, EMAIL_USER, EMAIL_PASSWORD
+from ai_service import extract_expense_from_email, DEEPSEEK_API_KEY
+from imap_tools import MailBox
 
 # Create tables on startup (simple for now)
-models.Base.metadata.create_all(bind=engine)
+try:
+    print("🗄️ Connecting to Database...")
+    models.Base.metadata.create_all(bind=engine)
+    print("✅ Database tables verified/created.")
+except Exception as e:
+    print(f"❌ Database connection failed: {e}")
+    exit(1)
 
-from email_service import get_unprocessed_emails, mark_as_processed
+def check_connections():
+    """Verify all external services are reachable before starting."""
+    print("🔍 Pre-flight checks...")
+    
+    # 1. Check AI Key
+    if not DEEPSEEK_API_KEY:
+        print("❌ DEEPSEEK_API_KEY is missing!")
+        return False
+
+    # 2. Check Search Queries
+    if not os.getenv("SEARCH_QUERIES"):
+        print("❌ SEARCH_QUERIES is missing in environment!")
+        return False
+    
+    # 3. Check Email Connection
+    try:
+        with MailBox(IMAP_SERVER).login(EMAIL_USER, EMAIL_PASSWORD) as mailbox:
+            print("✅ Email connection successful.")
+    except Exception as e:
+        print(f"❌ Email connection failed: {e}")
+        return False
+    
+    print("🚀 All systems green!")
+    return True
 
 def run_sync(db: Session):
     """
     Core logic to sync emails with the database.
     Can be called locally or from a scheduler.
     """
+    if not check_connections():
+        print("🛑 Sync aborted due to connection failures.")
+        return 0
+
     emails = get_unprocessed_emails()
     processed_count = 0
     
@@ -66,19 +101,5 @@ if __name__ == "__main__":
     with next(get_db()) as session:
         count = run_sync(session)
         print(f"🏁 Sync finished. Processed {count} emails.")
-    # data = base64.b64decode(cloud_event.data["message"]["data"]).decode()
-    # For Gmail push, the data contains the email address and historyId.
-    # We just use it as a signal to trigger our sync logic.
-    
-    from sqlalchemy.orm import Session
-    from database import SessionLocal
-    
-    db = SessionLocal()
-    try:
-        print("Triggering sync from Pub/Sub event...")
-        result = trigger_sync(db)
-        print(f"Sync completed: {result}")
-    finally:
-        db.close()
 
 
