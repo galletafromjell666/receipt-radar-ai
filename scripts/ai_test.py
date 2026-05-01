@@ -4,8 +4,6 @@ import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# Add parent directory to sys.path to allow importing from utils
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.utils import get_expense_extraction_prompt, check_connections
 
 load_dotenv()

@@ -10,11 +10,11 @@ Verifies the connection to the DeepSeek API and ensures the model is responding.
 **Usage:**
 - **Simple Hello World:**
   ```bash
-  python3 scripts/ai_test.py
+  python3 -m scripts.ai_test
   ```
 - **Test with sample banking email:**
   ```bash
-  python3 scripts/ai_test.py --email
+  python3 -m scripts.ai_test --email
   ```
 
 **All Arguments:**
@@ -26,27 +26,27 @@ Verifies the IMAP connection to Gmail, allowing you to list recent emails or fet
 **Usage:**
 - **List recent emails (default limit 10):**
   ```bash
-  python3 scripts/gmail_test.py
+  python3 -m scripts.gmail_test
   ```
 - **List emails from the last X days:**
   ```bash
-  python3 scripts/gmail_test.py --days 7
+  python3 -m scripts.gmail_test --days 7
   ```
 - **Set a custom fetch limit:**
   ```bash
-  python3 scripts/gmail_test.py --limit 20
+  python3 -m scripts.gmail_test --limit 20
   ```
 - **Search by keyword (Sender, Subject, or Body):**
   ```bash
-  python3 scripts/gmail_test.py --query "amazon"
+  python3 -m scripts.gmail_test --query "amazon"
   ```
 - **Show raw email content by UID:**
   ```bash
-  python3 scripts/gmail_test.py --id <EMAIL_ID>
+  python3 -m scripts.gmail_test --id <EMAIL_ID>
   ```
 - **Show email content + AI cleaned version:**
   ```bash
-  python3 scripts/gmail_test.py --id <EMAIL_ID> --llm
+  python3 -m scripts.gmail_test --id <EMAIL_ID> --llm
   ```
 
 **All Arguments:**
