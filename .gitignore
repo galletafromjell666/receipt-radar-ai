@@ -8,3 +8,9 @@ __pycache__/
 .idea/
 token.pickle
 credentials.json
+
+# Distribution / packaging
+*.egg-info/
+.eggs/
+dist/
+build/
