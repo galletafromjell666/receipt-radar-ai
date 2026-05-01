@@ -1,6 +1,5 @@
 import os
 import argparse
-import sys
 from datetime import datetime, timedelta
 
 from imap_tools import MailBox, AND

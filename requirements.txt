@@ -1,7 +1,0 @@
-sqlalchemy
-psycopg2-binary
-openai
-python-dotenv
-imap-tools
-beautifulsoup4
-ruff

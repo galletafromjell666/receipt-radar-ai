@@ -12,6 +12,7 @@ dependencies = [
     "python-dotenv",
     "imap-tools",
     "beautifulsoup4",
+    "ruff",
 ]
 
 [tool.ruff]
