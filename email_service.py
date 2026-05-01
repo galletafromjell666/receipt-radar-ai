@@ -9,7 +9,7 @@ load_dotenv()
 IMAP_SERVER = os.getenv("IMAP_SERVER")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-FETCH_DAYS_LIMIT = int(os.getenv("FETCH_DAYS_LIMIT", "30"))
+FETCH_DAYS_LIMIT = int(os.getenv("FETCH_DAYS_LIMIT"))
 
 def get_unprocessed_emails():
     results = []
@@ -34,8 +34,8 @@ def get_unprocessed_emails():
                 # Move NOT to the front to avoid Python's "positional after keyword" error
                 criteria = AND(NOT(keyword='$Processed'), date_gte=date_limit, text=query)
                 
-                # Fetch up to 20 per query (reverse order)
-                for msg in mailbox.fetch(criteria, limit=20, reverse=True):
+                # Fetch up to 50 per query (reverse order)
+                for msg in mailbox.fetch(criteria, limit=50, reverse=True):
                     if msg.uid in seen_uids:
                         continue
                     
