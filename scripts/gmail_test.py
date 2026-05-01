@@ -7,18 +7,17 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from imap_tools import MailBox, AND
 from dotenv import load_dotenv
-from src.utils import format_email_for_ai, clean_html
+from src.utils import format_email_for_ai, clean_html, check_connections
 
 load_dotenv()
 
 def test_gmail_connection(query=None, email_id=None, show_llm=False, days=None, limit=10):
+    if not check_connections():
+        return
+
     imap_server = os.getenv("IMAP_SERVER")
     email_user = os.getenv("EMAIL_USER")
     email_password = os.getenv("EMAIL_PASSWORD")
-
-    if not email_user or not email_password:
-        print("❌ Error: EMAIL_USER or EMAIL_PASSWORD not found in .env file.")
-        return
 
     print(f"🚀 Connecting to {imap_server}...")
     

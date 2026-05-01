@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from src.database import get_db, engine
 from datetime import datetime
 from src import models
-from src.email_service import get_unprocessed_emails, mark_as_processed, IMAP_SERVER, EMAIL_USER, EMAIL_PASSWORD
-from src.ai_service import extract_expense_from_email, DEEPSEEK_API_KEY
-from imap_tools import MailBox
+from src.email_service import get_unprocessed_emails, mark_as_processed
+from src.ai_service import extract_expense_from_email
+from src.utils import check_connections
 
 # Create tables on startup (simple for now)
 try:
@@ -16,36 +16,6 @@ try:
 except Exception as e:
     print(f"❌ Database connection failed: {e}")
     exit(1)
-
-def check_connections():
-    """Verify all external services are reachable and env vars are present before starting."""
-    print("🔍 Pre-flight checks...")
-    
-    # 1. Check AI Key
-    if not DEEPSEEK_API_KEY:
-        print("❌ DEEPSEEK_API_KEY is missing!")
-        return False
-
-    # 2. Check Search Queries
-    if not os.getenv("SEARCH_QUERIES"):
-        print("❌ SEARCH_QUERIES is missing in environment!")
-        return False
-    
-    # 3. Check Email Configuration
-    if not all([IMAP_SERVER, EMAIL_USER, EMAIL_PASSWORD]):
-        print("❌ Email configuration (IMAP_SERVER, USER, or PASSWORD) is missing!")
-        return False
-    
-    # 4. Check Email Connection
-    try:
-        with MailBox(IMAP_SERVER).login(EMAIL_USER, EMAIL_PASSWORD) as mailbox:
-            print("✅ Email connection successful.")
-    except Exception as e:
-        print(f"❌ Email connection failed: {e}")
-        return False
-    
-    print("🚀 All systems green!")
-    return True
 
 def run_sync(db: Session):
     """

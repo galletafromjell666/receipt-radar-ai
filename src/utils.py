@@ -1,3 +1,6 @@
+import os
+from imap_tools import MailBox
+
 def get_expense_extraction_prompt(email_content):
     """
     Returns the standard prompt used for extracting expense data from email content.
@@ -62,3 +65,38 @@ def clean_html(html_content):
     lines = (line.strip() for line in text.splitlines())
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     return '\n'.join(chunk for chunk in chunks if chunk)
+
+def check_connections():
+    """Verify all external services are reachable and env vars are present before starting."""
+    print("🔍 Pre-flight checks...")
+    
+    # 1. Check AI Key
+    api_key = os.getenv("DEEPSEEK_API_KEY")
+    if not api_key:
+        print("❌ DEEPSEEK_API_KEY is missing!")
+        return False
+
+    # 2. Check Search Queries
+    if not os.getenv("SEARCH_QUERIES"):
+        print("❌ SEARCH_QUERIES is missing in environment!")
+        return False
+    
+    # 3. Check Email Configuration
+    imap_server = os.getenv("IMAP_SERVER")
+    email_user = os.getenv("EMAIL_USER")
+    email_password = os.getenv("EMAIL_PASSWORD")
+    
+    if not all([imap_server, email_user, email_password]):
+        print("❌ Email configuration (IMAP_SERVER, USER, or PASSWORD) is missing!")
+        return False
+    
+    # 4. Check Email Connection
+    try:
+        with MailBox(imap_server).login(email_user, email_password) as mailbox:
+            print("✅ Email connection successful.")
+    except Exception as e:
+        print(f"❌ Email connection failed: {e}")
+        return False
+    
+    print("🚀 All systems green!")
+    return True

@@ -6,18 +6,17 @@ from dotenv import load_dotenv
 
 # Add parent directory to sys.path to allow importing from utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.utils import get_expense_extraction_prompt
+from src.utils import get_expense_extraction_prompt, check_connections
 
 load_dotenv()
 
 def test_deepseek_connection(custom_email=None):
+    if not check_connections():
+        return
+
     api_key = os.getenv("DEEPSEEK_API_KEY")
     base_url = os.getenv("DEEPSEEK_BASE_URL")
     model = os.getenv("DEEPSEEK_MODEL")
-
-    if not api_key:
-        print("❌ Error: DEEPSEEK_API_KEY not found in .env file.")
-        return
 
     client = OpenAI(api_key=api_key, base_url=base_url)
 
