@@ -2,7 +2,7 @@ import os
 import json
 from sqlalchemy.orm import Session
 from src.database import get_db, engine
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from src import models
 from src.email_service import get_unprocessed_emails, mark_as_processed
 from src.ai_service import extract_expense_from_email
@@ -49,9 +49,27 @@ def run_sync(db: Session):
             # 2. Save to DB
             extracted_date = extracted_data.get("date")
             try:
-                expense_date = datetime.fromisoformat(extracted_date.replace("Z", "+00:00")) if extracted_date else datetime.utcnow()
-            except:
-                expense_date = datetime.utcnow()
+                if extracted_date:
+                    # Parse the ISO date
+                    dt = datetime.fromisoformat(extracted_date.replace("Z", "+00:00"))
+                    
+                    # If the date has no timezone (naive), assume it is GMT-6 (El Salvador)
+                    # and convert it to UTC (GMT)
+                    if dt.tzinfo is None:
+                        # GMT-6 to UTC: Add 6 hours
+                        dt = dt.replace(tzinfo=timezone(timedelta(hours=-6)))
+                    
+                    expense_date = dt.astimezone(timezone.utc)
+                else:
+                    expense_date = datetime.now(timezone.utc)
+            except Exception as e:
+                print(f"⚠️ Date parsing failed: {e}. Using current UTC time.")
+                expense_date = datetime.now(timezone.utc)
+
+            # Ensure the date saved to DB is naive UTC for consistency if needed,
+            # but usually keeping it as offset-aware UTC is better.
+            # We'll strip tzinfo for DB compatibility if the column is TIMESTAMP WITHOUT TIME ZONE
+            expense_date = expense_date.replace(tzinfo=None)
 
             new_expense = models.Expense(
                 email_id=email_data["email_id"],

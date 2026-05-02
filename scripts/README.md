@@ -49,6 +49,14 @@ Verifies the IMAP connection to Gmail, allowing you to list recent emails or fet
   python3 -m scripts.gmail_test --id <EMAIL_ID> --llm
   ```
 
+### 3. Database Maintenance ([fix_dates_tz.py](fix_dates_tz.py))
+A one-time script to convert existing database records from El Salvador time (GMT-6) to UTC (GMT).
+
+**Usage:**
+  ```bash
+  python3 -m scripts.fix_dates_tz
+  ```
+
 **All Arguments:**
 - `--query`: Search string to filter emails.
 - `--id`: Specific email UID to fetch and display.
