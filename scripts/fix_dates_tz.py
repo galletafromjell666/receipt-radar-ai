@@ -7,14 +7,17 @@ load_dotenv()
 
 def fix_existing_dates():
     """
-    One-time script to convert existing dates in the database from GMT-6 to UTC.
-    It adds 6 hours to all existing records.
+    One-time script to convert existing dates in the database from local time to UTC.
+    It reads TIMEZONE_OFFSET from .env (e.g., -6 for El Salvador) and adjusts the records.
     """
     print("🚀 Connecting to database to fix dates...")
     
-    # SQL to update dates: Add 6 hours to every date in the expenses table
-    # This assumes they were stored as local El Salvador time (GMT-6)
-    update_query = text("UPDATE expenses SET date = date + interval '6 hours';")
+    tz_offset = int(os.getenv("TIMEZONE_OFFSET", "-6"))
+    # If offset is -6, we need to add 6 hours to reach UTC
+    hours_to_add = -tz_offset
+    
+    # SQL to update dates: Add the necessary hours to every date in the expenses table
+    update_query = text(f"UPDATE expenses SET date = date + interval '{hours_to_add} hours';")
     
     try:
         with engine.connect() as connection:

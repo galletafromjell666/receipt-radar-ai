@@ -53,11 +53,12 @@ def run_sync(db: Session):
                     # Parse the ISO date
                     dt = datetime.fromisoformat(extracted_date.replace("Z", "+00:00"))
                     
-                    # If the date has no timezone (naive), assume it is GMT-6 (El Salvador)
+                    # If the date has no timezone (naive), assume it is the local bank timezone
+                    # (configured via TIMEZONE_OFFSET, e.g., -6 for El Salvador)
                     # and convert it to UTC (GMT)
                     if dt.tzinfo is None:
-                        # GMT-6 to UTC: Add 6 hours
-                        dt = dt.replace(tzinfo=timezone(timedelta(hours=-6)))
+                        tz_offset = int(os.getenv("TIMEZONE_OFFSET", "-6"))
+                        dt = dt.replace(tzinfo=timezone(timedelta(hours=tz_offset)))
                     
                     expense_date = dt.astimezone(timezone.utc)
                 else:
