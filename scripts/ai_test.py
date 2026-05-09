@@ -1,9 +1,10 @@
-import os
 import json
-from openai import OpenAI
-from dotenv import load_dotenv
+import os
 
-from src.utils import get_expense_extraction_prompt, check_connections
+from dotenv import load_dotenv
+from openai import OpenAI
+
+from src.utils import check_connections, get_expense_extraction_prompt
 
 load_dotenv()
 

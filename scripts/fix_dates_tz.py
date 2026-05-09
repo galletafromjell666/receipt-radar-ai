@@ -1,7 +1,9 @@
 import os
-from sqlalchemy import text
-from src.database import engine
+
 from dotenv import load_dotenv
+from sqlalchemy import text
+
+from src.database import engine
 
 load_dotenv()
 

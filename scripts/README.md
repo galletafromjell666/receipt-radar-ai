@@ -10,11 +10,11 @@ Verifies the connection to the DeepSeek API and ensures the model is responding.
 **Usage:**
 - **Simple Hello World:**
   ```bash
-  python3 -m scripts.ai_test
+  uv run python -m scripts.ai_test
   ```
 - **Test with sample banking email:**
   ```bash
-  python3 -m scripts.ai_test --email
+  uv run python -m scripts.ai_test --email
   ```
 
 **All Arguments:**
@@ -26,27 +26,27 @@ Verifies the IMAP connection to Gmail, allowing you to list recent emails or fet
 **Usage:**
 - **List recent emails (default limit 10):**
   ```bash
-  python3 -m scripts.gmail_test
+  uv run python -m scripts.gmail_test
   ```
 - **List emails from the last X days:**
   ```bash
-  python3 -m scripts.gmail_test --days 7
+  uv run python -m scripts.gmail_test --days 7
   ```
 - **Set a custom fetch limit:**
   ```bash
-  python3 -m scripts.gmail_test --limit 20
+  uv run python -m scripts.gmail_test --limit 20
   ```
 - **Search by keyword (Sender, Subject, or Body):**
   ```bash
-  python3 -m scripts.gmail_test --query "amazon"
+  uv run python -m scripts.gmail_test --query "amazon"
   ```
 - **Show raw email content by UID:**
   ```bash
-  python3 -m scripts.gmail_test --id <EMAIL_ID>
+  uv run python -m scripts.gmail_test --id <EMAIL_ID>
   ```
 - **Show email content + AI cleaned version:**
   ```bash
-  python3 -m scripts.gmail_test --id <EMAIL_ID> --llm
+  uv run python -m scripts.gmail_test --id <EMAIL_ID> --llm
   ```
 
 ### 3. Database Maintenance ([fix_dates_tz.py](fix_dates_tz.py))
@@ -54,7 +54,7 @@ A one-time script to convert existing database records from El Salvador time (GM
 
 **Usage:**
   ```bash
-  python3 -m scripts.fix_dates_tz
+  uv run python -m scripts.fix_dates_tz
   ```
 
 **All Arguments:**

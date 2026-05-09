@@ -24,7 +24,8 @@ x/
 ├── scripts/            # Testing and setup utilities
 ├── main.py             # Main entry point
 ├── .env                # Local configuration (ignored)
-└── requirements.txt    # Project dependencies
+├── pyproject.toml      # Project metadata and dependencies
+└── uv.lock             # Locked dependencies
 ```
 
 ## Getting Started
@@ -35,12 +36,11 @@ x/
 git clone <your-repo-url>
 cd receipt-radar-ai
 
-# Set up virtual environment
-python3 -m venv venv
-source venv/bin/activate
+# Install uv if you don't have it
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install dependencies
-pip install .
+# Sync dependencies (creates .venv and installs everything)
+uv sync
 ```
 
 ### 2. Configuration
@@ -53,7 +53,7 @@ Copy `.env.example` to `.env` and fill in your credentials:
 ### 3. Usage
 To trigger a synchronization:
 ```bash
-python3 main.py
+uv run python main.py
 ```
 
 ## Linting & Formatting
@@ -62,13 +62,13 @@ The project uses **Ruff** for fast linting and formatting.
 
 ```bash
 # Check for errors and unused imports
-ruff check .
+uv run ruff check .
 
 # Automatically fix fixable errors
-ruff check --fix .
+uv run ruff check --fix .
 
 # Format the codebase
-ruff format .
+uv run ruff format .
 ```
 
 ## Testing & Utilities

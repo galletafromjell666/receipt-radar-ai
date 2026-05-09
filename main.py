@@ -1,11 +1,13 @@
-import os
 import json
+import os
+from datetime import datetime, timedelta, timezone
+
 from sqlalchemy.orm import Session
-from src.database import get_db, engine
-from datetime import datetime, timezone, timedelta
+
 from src import models
-from src.email_service import get_unprocessed_emails, mark_as_processed
 from src.ai_service import extract_expense_from_email
+from src.database import engine, get_db
+from src.email_service import get_unprocessed_emails, mark_as_processed
 from src.utils import check_connections
 
 # Create tables on startup (simple for now)

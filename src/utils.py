@@ -1,5 +1,7 @@
 import os
+
 from imap_tools import MailBox
+
 
 def get_expense_extraction_prompt(email_content):
     """
