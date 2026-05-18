@@ -2,17 +2,27 @@ import os
 
 from imap_tools import MailBox
 
+from src.models import DEFAULT_CATEGORIES
 
-def get_expense_extraction_prompt(email_content):
+
+def get_expense_extraction_prompt(email_content, available_categories=None):
     """
     Returns the standard prompt used for extracting expense data from email content.
+    If available_categories is provided, constrains the category to that list.
     """
+    if available_categories:
+        cat_list = ", ".join(available_categories)
+        cat_line = f"- category (string, must be one of: {cat_list})"
+    else:
+        cat_list = ", ".join(DEFAULT_CATEGORIES)
+        cat_line = f"- category (string, must be one of: {cat_list})"
+
     return f"""
     Extract expense information from the following email content.
     Return the result as a JSON object with these keys:
     - amount (float)
     - currency (string, 3-letter code)
-    - category (string, e.g., Food, Transport, Utilities, Entertainment, etc.)
+    {cat_line}
     - merchant (string)
     - source (string, the bank or financial institution, e.g., Banco Cuscatlan)
     - account (string, the specific card or account identifier, e.g., XXXXXXXXXX9104, we just need the last 4 digits without the Xs or whatever is available)

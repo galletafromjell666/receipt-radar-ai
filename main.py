@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime, timedelta, timezone
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from src import models
@@ -15,6 +16,12 @@ try:
     print("🗄️ Connecting to Database...")
     models.Base.metadata.create_all(bind=engine)
     print("✅ Database tables verified/created.")
+    db = next(get_db())
+    try:
+        models.seed_categories(db)
+        print("✅ Categories seeded.")
+    finally:
+        db.close()
 except Exception as e:
     print(f"❌ Database connection failed: {e}")
     exit(1)
@@ -27,6 +34,20 @@ def run_sync(db: Session):
     if not check_connections():
         print("🛑 Sync aborted due to connection failures.")
         return 0
+
+    active_categories = (
+        db.query(models.Category)
+        .filter(models.Category.is_active.is_(True))
+        .order_by(models.Category.id)
+        .all()
+    )
+    if not active_categories:
+        print("❌ No categories found in DB. Seed the categories first.")
+        return 0
+
+    default_other = db.query(models.Category).filter_by(name="Other").first()
+    category_names = [c.name for c in active_categories]
+    print(f"🏷️  Categories sent to LLM: {', '.join(category_names)}")
 
     emails = get_unprocessed_emails()
     processed_count = 0
@@ -43,10 +64,26 @@ def run_sync(db: Session):
             print(email_data["body"])
             print("-" * 40)
             
-            extracted_data = extract_expense_from_email(email_data["body"])
+            extracted_data = extract_expense_from_email(
+                email_data["body"], available_categories=category_names
+            )
             
             print("✨ AI Extracted Data:")
             print(json.dumps(extracted_data, indent=2))
+
+            # Resolve category: match LLM output to a known category
+            category_name = extracted_data.get("category", "Other")
+            matched = db.query(models.Category).filter(
+                func.lower(models.Category.name) == func.lower(category_name.strip()),
+                models.Category.is_active.is_(True),
+            ).first()
+            if matched:
+                category_id = matched.id
+            else:
+                print(
+                    f"⚠️ Unknown category '{category_name}', falling back to 'Other'"
+                )
+                category_id = default_other.id if default_other else 1
             
             # 2. Save to DB
             extracted_date = extracted_data.get("date")
@@ -78,7 +115,7 @@ def run_sync(db: Session):
                 email_id=email_data["email_id"],
                 amount=extracted_data.get("amount"),
                 currency=extracted_data.get("currency", "USD"),
-                category=extracted_data.get("category"),
+                category_id=category_id,
                 merchant=extracted_data.get("merchant"),
                 source=extracted_data.get("source"),
                 account=extracted_data.get("account"),

@@ -14,8 +14,8 @@ DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL")
 
 client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url=DEEPSEEK_BASE_URL)
 
-def extract_expense_from_email(email_content: str):
-    prompt = get_expense_extraction_prompt(email_content)
+def extract_expense_from_email(email_content: str, available_categories=None):
+    prompt = get_expense_extraction_prompt(email_content, available_categories)
     
     # Initialize client inside function or ensure global is ready
     # Since we validated in main.py, we just use the global client
