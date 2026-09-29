@@ -9,7 +9,7 @@ from src import models
 from src.ai_service import extract_expense_from_email
 from src.database import engine, get_db
 from src.email_service import get_unprocessed_emails, mark_as_processed
-from src.utils import check_connections, load_hints
+from src.utils import build_hints_block, check_connections, load_hints
 
 # Create tables on startup (simple for now)
 try:
@@ -55,6 +55,7 @@ def run_sync(db: Session):
             f"💡 Merchant hints loaded: {len(hints)} known, "
             f"{len(ambiguous)} ambiguous"
         )
+        print(build_hints_block(hints, ambiguous))
     else:
         print(
             "💡 No merchant hints found. Run: "

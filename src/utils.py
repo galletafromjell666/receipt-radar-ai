@@ -25,19 +25,18 @@ def load_hints(limit=30):
     )
 
 
-def _build_hints_block(hints, ambiguous):
+def build_hints_block(hints, ambiguous):
     blocks = []
     if hints:
         lines = "\n".join(f"- {h['merchant']} -> {h['category']}" for h in hints)
         blocks.append(
-            "Known merchants (match approximately: same brand even if spelled "
-            "differently or prefixed by a payment processor such as N1CO*, "
-            "PedidosYa*, WOMPI* or DLC*). Treat these as a strong prior:\n"
-            f"{lines}"
+            "Known merchants → categories. Match the brand even if spelled "
+            "differently or prefixed by a processor (N1CO*, PedidosYa*). "
+            f"Strong prior:\n{lines}"
         )
     if ambiguous:
         lines = "\n".join(
-            "- {} -> {} (pick the best fit for this email)".format(
+            "- {} -> {}".format(
                 a["merchant"],
                 ", ".join(f"{c} ({n})" for c, n in a["categories"].items()),
             )
@@ -62,7 +61,7 @@ def get_expense_extraction_prompt(email_content, available_categories=None):
         cat_list = ", ".join(DEFAULT_CATEGORIES)
         cat_line = f"- category (string, must be one of: {cat_list})"
 
-    hints_block = _build_hints_block(*load_hints())
+    hints_block = build_hints_block(*load_hints())
 
     return f"""
     Extract expense information from the following email content.
