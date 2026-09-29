@@ -64,6 +64,25 @@ A one-time script to convert existing database records from El Salvador time (GM
 - `--days`: Number of days back to search (e.g., `--days 30`).
 - `--limit`: Maximum number of emails to display (default: 10).
 
+### 4. Expense Analysis & Categorization Hints ([analyze_expenses.py](analyze_expenses.py))
+Read-only month-by-month analysis of stored expenses. Reports category and
+merchant breakdowns per month, the `Other` fallbacks (LLM misses), merchants
+whose expenses are split across categories, and rows manually edited after
+creation (`updated_at > created_at`).
+
+It also writes `data/category_hints.json`: consistent merchants (single
+category) plus merchants whose name is shared across categories (which the
+prompt tells the LLM to decide per email). `src/utils.py` appends both.
+
+**Usage:**
+  ```bash
+  uv run python -m scripts.analyze_expenses            # all months
+  uv run python -m scripts.analyze_expenses --months 3 # last 3 months
+  uv run python -m scripts.analyze_expenses --top 20   # top N merchants/hints
+  uv run python -m scripts.analyze_expenses --no-write-hints
+  uv run python -m scripts.analyze_expenses --self-test
+  ```
+
 ## Configuration
 Both scripts rely on the `.env` file in the project root. Ensure you have the following variables set:
 - `DEEPSEEK_API_KEY`: Your API key.

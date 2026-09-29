@@ -53,6 +53,7 @@ class Expense(Base):
     description = Column(Text)
     date = Column(DateTime, default=datetime.utcnow, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
 
     category = relationship("Category", back_populates="expenses")
 

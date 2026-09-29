@@ -9,7 +9,7 @@ from src import models
 from src.ai_service import extract_expense_from_email
 from src.database import engine, get_db
 from src.email_service import get_unprocessed_emails, mark_as_processed
-from src.utils import check_connections
+from src.utils import check_connections, load_hints
 
 # Create tables on startup (simple for now)
 try:
@@ -48,6 +48,18 @@ def run_sync(db: Session):
     default_other = db.query(models.Category).filter_by(name="Other").first()
     category_names = [c.name for c in active_categories]
     print(f"🏷️  Categories sent to LLM: {', '.join(category_names)}")
+
+    hints, ambiguous = load_hints()
+    if hints or ambiguous:
+        print(
+            f"💡 Merchant hints loaded: {len(hints)} known, "
+            f"{len(ambiguous)} ambiguous"
+        )
+    else:
+        print(
+            "💡 No merchant hints found. Run: "
+            "uv run python -m scripts.analyze_expenses"
+        )
 
     emails = get_unprocessed_emails()
     processed_count = 0
