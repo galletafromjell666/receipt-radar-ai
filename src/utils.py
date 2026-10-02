@@ -66,6 +66,8 @@ def get_expense_extraction_prompt(email_content, available_categories=None):
     return f"""
     Extract expense information from the following email content.
     Return the result as a JSON object with these keys:
+    - is_expense (boolean): true only for a purchase at a merchant; false for
+      payments, transfers, refunds/abonos, cash advances and statements.
     - amount (float)
     - currency (string, 3-letter code)
     {cat_line}

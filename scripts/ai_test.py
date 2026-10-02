@@ -50,18 +50,56 @@ def test_deepseek_connection(custom_email=None):
         except Exception as e:
             print(f"\n❌ Connection failed: {e}")
 
+PAYMENT_EMAIL = """From: davivienda_notifica@davivienda.com.sv
+Date: 2026-10-01 17:06:22
+Subject: Notificacion
+
+Content:
+Estimado(a) Cliente: CLIENTE DE PRUEBA
+Le notificamos que su cuenta ****0000 ha sido cargada cuyos detalles se
+muestran a continuacion: Propietario Cta. Destino : ****** En concepto de
+: PAGO DE TARJETA DE CREDITO Fecha y Hora : 01/10/26 11:06:44 AM Numero de
+confirmacion : 0 Monto : 12.20 NOTA: Si no ha sido realizada por usted,
+llamar de inmediato al 2556-0000"""
+
+PURCHASE_EMAIL = """From: davivienda_notifica@davivienda.com.sv
+Date: 2026-09-23 19:46:11
+Subject: Notificacion
+
+Content:
+Estimado(a) cliente de Banco Davivienda: Le informamos que su Tarjeta de
+Credito: 0000 fue Cargada. A continuacion el detalle: Monto de transaccion /
+moneda: 12.20 USD Nombre del comercio: CLOUDFLARE Fecha: 23/09/2026
+19:46:11 Localizacion del comercio: ESTADOS UNIDOS DE AMERICA"""
+
+
+def test_is_expense_classification():
+    """A payment must be is_expense=false; a real purchase must be true."""
+    from src.ai_service import extract_expense_from_email
+
+    payment = extract_expense_from_email(PAYMENT_EMAIL)
+    purchase = extract_expense_from_email(PURCHASE_EMAIL)
+    print("\npayment :", json.dumps(payment, indent=2))
+    print("purchase:", json.dumps(purchase, indent=2))
+    assert payment.get("is_expense") is False, payment
+    assert purchase.get("is_expense") is True, purchase
+    print("\n✅ Classification self-test ok")
+
+
 if __name__ == "__main__":
     # Test with the specific email provided by the user if requested
     import sys as system_sys
-    if len(system_sys.argv) > 1 and system_sys.argv[1] == "--email":
+    if len(system_sys.argv) > 1 and system_sys.argv[1] == "--classify":
+        test_is_expense_classification()
+    elif len(system_sys.argv) > 1 and system_sys.argv[1] == "--email":
         sample_email = """From: notificaciones@bancocuscatlan.com 
 Date: 2026-04-29 21:24:00
 Subject: Compra con Tarjeta de Credito Titular 
 
 Content: 
 1213 
-Estimado Cliente: GIOVANNI
-Se ha realizado una compra con su tarjeta titular de Banco CUSCATLAN XXXXXXXXXX1111 por USD 5.30 en DeepSeek el día 2026-04-29 21:24. Consultas al 22122000."""
+Estimado Cliente: CLIENTE DE PRUEBA
+Se ha realizado una compra con su tarjeta titular de Banco CUSCATLAN XXXXXXXXXX0000 por USD 5.30 en DeepSeek el día 2026-04-29 21:24. Consultas al 22122000."""
         test_deepseek_connection(custom_email=sample_email)
     else:
         test_deepseek_connection()

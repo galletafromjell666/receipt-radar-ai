@@ -84,6 +84,13 @@ def run_sync(db: Session):
             print("✨ AI Extracted Data:")
             print(json.dumps(extracted_data, indent=2))
 
+            # Payments, transfers and credits are not expenses: mark the email
+            # handled so it is not re-sent to the LLM every sync, and store nothing.
+            if not extracted_data.get("is_expense", True):
+                print("⏭️ Not an expense (payment/transfer/credit). Skipping.")
+                mark_as_processed(email_data["email_id"])
+                continue
+
             # Resolve category: match LLM output to a known category
             category_name = extracted_data.get("category", "Other")
             matched = db.query(models.Category).filter(
