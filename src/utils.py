@@ -84,6 +84,43 @@ def get_expense_extraction_prompt(email_content, available_categories=None):
     {email_content}
     """
 
+
+def get_budget_prompt(budget_input, days=90, cap=None):
+    """Prompt asking the LLM to turn recent spend into monthly limits per category."""
+    total_spent = sum(b["total"] for b in budget_input)
+    lines = "\n".join(
+        "- {category}: {days}-day total {total:.2f} ({share:.0%} of spend), "
+        "{count} expenses, avg/month {avg_month:.2f}".format(days=days, **b)
+        for b in budget_input
+    )
+    cap_line = ""
+    if cap:
+        cap_line = (
+            f"\n    Hard constraint: the sum of every monthly_limit must NOT "
+            f"exceed {cap:.2f}.\n    Cut discretionary categories first to make "
+            "room for essentials.\n"
+        )
+    return f"""
+    You are setting a monthly budget per spending category, based on the
+    last {days} days of expenses (total spent: {total_spent:.2f}). For each
+    category below, propose a sensible monthly limit, anchored on the
+    average/month and rounded to a clean number. A category with no spend gets
+    0. The spend share shows the biggest buckets, so prioritize those.
+    {cap_line}
+    Return a JSON object with a single key "budgets": an array of objects with
+    keys:
+    - category (string, must be one of the categories below)
+    - monthly_limit (float)
+    - reason (string): one short line on WHY this limit — essential vs
+      discretionary, a savings goal, or a one-off. Do NOT repeat the average,
+      the limit, or any percentage; those are shown next to it already. Example:
+      "Discretionary; trimmed to protect essentials."
+
+    Categories:
+    {lines}
+    """
+
+
 def format_email_for_ai(msg):
     """
     Consolidates subject, sender, date, and cleaned body into a single string for the AI.

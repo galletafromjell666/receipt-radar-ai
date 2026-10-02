@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from src.utils import get_expense_extraction_prompt
+from src.utils import get_budget_prompt, get_expense_extraction_prompt
 
 load_dotenv()
 
@@ -26,6 +26,27 @@ def extract_expense_from_email(email_content: str, available_categories=None):
             {"role": "user", "content": prompt}
         ],
         response_format={"type": "json_object"}
+    )
+
+    return json.loads(response.choices[0].message.content)
+
+
+def suggest_budget(budget_input, days=90, cap=None):
+    prompt = get_budget_prompt(budget_input, days, cap)
+
+    response = client.chat.completions.create(
+        model=DEEPSEEK_MODEL,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a helpful financial assistant that proposes "
+                    "monthly budgets as JSON."
+                ),
+            },
+            {"role": "user", "content": prompt},
+        ],
+        response_format={"type": "json_object"},
     )
 
     return json.loads(response.choices[0].message.content)

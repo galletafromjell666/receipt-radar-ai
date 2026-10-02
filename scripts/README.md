@@ -83,6 +83,24 @@ prompt tells the LLM to decide per email). `src/utils.py` appends both.
   uv run python -m scripts.analyze_expenses --self-test
   ```
 
+### 5. Suggested Budget ([make_budget.py](make_budget.py))
+Read-only. Aggregates the last N days (default 90) of spend per active
+category and asks DeepSeek to propose a monthly limit for each. Prints the
+result and writes it to `data/budgets/YYYY-MM-DD.md` (local date).
+
+**Usage:**
+  ```bash
+  uv run python -m scripts.make_budget            # 90-day window
+  uv run python -m scripts.make_budget --days 120
+  uv run python -m scripts.make_budget --cap 800  # hold the total budget under $800
+  uv run python -m scripts.make_budget --self-test
+  ```
+
+**All Arguments:**
+- `--days`: Size of the look-back window in days (default: 90).
+- `--cap`: Hard ceiling on the total suggested monthly budget.
+- `--self-test`: Run the pure-function checks and exit.
+
 ## Configuration
 Both scripts rely on the `.env` file in the project root. Ensure you have the following variables set:
 - `DEEPSEEK_API_KEY`: Your API key.
